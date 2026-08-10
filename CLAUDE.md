@@ -54,7 +54,7 @@ No saltar fases ni reordenarlas por conveniencia. Las Fases 2 (arnés) y 7 (stre
 
 - La documentación se escribe **en el momento**, no al final. La escrita después es una reconstrucción.
 - **Lo que no funcionó también se escribe**, en `docs/`. Los callejones sin salida son material de aprendizaje y señal de proceso real.
-- `docs/learning-log.md` — qué era nuevo, qué costó, qué error se cometió y cómo se resolvió. Se llena por fase, desde el día uno.
+- `docs/learning-log.md` — qué era nuevo, qué costó, qué error se cometió y cómo se resolvió. Se llena por fase, desde el día uno. **Se llena en colaboración:** Claude pregunta (en el momento del atasco, o al cerrar la fase) y ayuda a redactar; nunca lo inventa sin preguntar, y tampoco lo deja como plantilla vacía sin ofrecerse a ayudar.
 - `docs/metrics-log.md` — fecha, fase, cambio aplicado, tabla antes/después, y qué sorprendió.
 - **ADRs** en `docs/adr/`, formato consistente: contexto / decisión / consecuencias / alternativas descartadas. Media página basta. Cada ADR numerado en `PLAN.md` (ADR-002, ADR-101, ADR-102…) debe existir cuando su ticket se cierra.
 
