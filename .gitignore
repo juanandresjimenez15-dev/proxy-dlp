@@ -1,0 +1,26 @@
+# Entorno
+venv/
+.env
+.env.*
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Editor / SO
+.DS_Store
+.vscode/
+.idea/
+
+# Corpus con datos reales — el corpus de eval/ debe ser 100% sintetico (ver PLAN.md TICKET-201).
+# Cualquier archivo que contenga datos reales de una persona va aqui, nunca al repo.
+eval/corpus/**/real/
+*.real.json
+*.real.csv

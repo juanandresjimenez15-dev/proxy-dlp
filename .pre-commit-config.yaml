@@ -1,0 +1,20 @@
+repos:
+  - repo: local
+    hooks:
+      - id: identidad-personal
+        name: Verifica identidad de git (no corporativa)
+        entry: scripts/check-git-identity.sh
+        language: system
+        pass_filenames: false
+        always_run: true
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff
+        args: [--fix]
+
+  - repo: https://github.com/psf/black
+    rev: 24.8.0
+    hooks:
+      - id: black

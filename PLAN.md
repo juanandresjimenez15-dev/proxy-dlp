@@ -286,8 +286,8 @@ Si empiezas así, **todos los commits de tu portafolio quedan atribuidos a la cu
 
 ### TICKET-001 — Esqueleto del repositorio
 
-- [ ] `git init` + repo en GitHub (**público** — un portafolio privado no sirve de nada)
-- [ ] Estructura:
+- [x] `git init` + repo en GitHub (**público** — un portafolio privado no sirve de nada) — hecho en TICKET-000
+- [x] Estructura:
   ```
   app/
     proxy/            # capa HTTP, contrato OpenAI
@@ -308,10 +308,11 @@ Si empiezas así, **todos los commits de tu portafolio quedan atribuidos a la cu
     metrics-log.md
   config/
   ```
-- [ ] Entorno: `venv`, `requirements.txt` / `pyproject.toml`, `pytest` con marcadores (`unit`, `integration`, `redteam`, `slow`)
-- [ ] Linter y formateador (`ruff` + `black`) corriendo en pre-commit
-- [ ] `.gitignore` que excluya `.env`, `venv/`, y **cualquier archivo de corpus con datos reales**
-- [ ] **Test:** el CI falla si un test falla (verifica el verificador — rompe un test a propósito y confirma que el pipeline se pone rojo)
+  Carpetas vacías con `.gitkeep` (git no versiona carpetas vacías). `docs/learning-log.md` y `docs/metrics-log.md` creados con su estructura, sin contenido inventado — el primero lo llena Juan por fase, el segundo se llena al correr el arnés (TICKET-203)
+- [x] Entorno: `venv` con **Python 3.12** vía Homebrew (el `python3` del sistema es 3.9.6, no se usa), `pyproject.toml` con `pytest` y sus 4 marcadores, instalado en modo editable (`pip install -e ".[dev]"`)
+- [x] Linter y formateador (`ruff` + `black`) corriendo en pre-commit — vía `.pre-commit-config.yaml`, que también migra el check de identidad de TICKET-000 a versión versionada (`scripts/check-git-identity.sh`)
+- [x] `.gitignore` que excluya `.env`, `venv/`, y **cualquier archivo de corpus con datos reales**
+- [x] **Test:** verificado localmente que `pytest` retorna exit code distinto de cero cuando un test falla, y que el marcador `unit` filtra correctamente (test desechable, borrado tras confirmar). La verificación de que **el CI** se pone rojo queda pendiente hasta TICKET-002, que es cuando el CI existe
 
 ### TICKET-002 — CI con separación de jobs
 

@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[project]
+name = "proxy-dlp"
+version = "0.1.0"
+description = "Proxy DLP para LLMs con foco en espanol/LATAM, robustez adversarial y streaming"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3",
+    "ruff>=0.6",
+    "black>=24.8",
+    "pre-commit>=3.8",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+markers = [
+    "unit: rapidos, sin dependencias externas ni red",
+    "integration: flujo completo contra el stub local del LLM",
+    "redteam: suite adversarial contra el sistema real, no corre en cada push",
+    "slow: tests que tardan mas de lo normal, se excluyen del feedback rapido",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
