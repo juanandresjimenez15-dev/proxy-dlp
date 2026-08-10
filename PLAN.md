@@ -318,17 +318,17 @@ Si empiezas así, **todos los commits de tu portafolio quedan atribuidos a la cu
 
 Aquí se resuelve una tensión que el backlog original tenía sin notar: el CI corre en cada push, pero la suite de red-team debe correr contra el sistema real (no mockeado). Llamadas reales al LLM en cada push = costo, lentitud y no-determinismo.
 
-- [ ] Job `fast` — unit + integration con LLM stub. Corre en **cada push**. Debe durar < 2 min
-- [ ] Job `redteam` — suite adversarial completa. Corre **manual (`workflow_dispatch`) y nocturno**, no en cada push
-- [ ] Secretos del proveedor LLM en GitHub Secrets, nunca en el repo
-- [ ] Un stub local determinista del LLM (responde de forma fija) para que el job `fast` no dependa de la red
-- [ ] **ADR-002:** por qué el red-team no corre en cada push, y qué se pierde con esa decisión
+- [x] Job `fast` — unit + integration con LLM stub. Corre en **cada push**. Debe durar < 2 min — `.github/workflows/ci.yml`, corre contra `tests/stubs/llm_stub.py`
+- [x] Job `redteam` — suite adversarial completa. Corre **manual (`workflow_dispatch`)**. El disparador **nocturno queda diferido a la Fase 8** (ver ADR-002): un cron sin ataques que correr todavía solo genera ruido sin señal
+- [x] Secretos del proveedor LLM en GitHub Secrets, nunca en el repo — **no aplica hoy**: el red-team corre contra Ollama local (gratis, sin llave de API). Cuando llegue la corrida puntual contra un modelo comercial (ver ADR-002, "consecuencias"), ese secreto se configura en ese momento, nunca en el repo
+- [x] Un stub local determinista del LLM (responde de forma fija) para que el job `fast` no dependa de la red — `tests/stubs/llm_stub.py`, verificado
+- [x] **ADR-002:** por qué el red-team no corre en cada push, y qué se pierde con esa decisión — `docs/adr/ADR-002-redteam-no-en-cada-push.md`
 
 ### TICKET-003 — Higiene de secretos
 
-- [ ] API keys del upstream solo por variable de entorno; el proceso falla al arrancar si falta una
-- [ ] Escaneo de secretos en CI (`gitleaks` o el escaneo nativo de GitHub)
-- [ ] **Test:** ningún objeto de configuración expone la key en su `__repr__` o al serializarse (esto es un fallo real y común)
+- [x] Escaneo de secretos en CI (`gitleaks`) — wireado en el job `fast` de `.github/workflows/ci.yml`
+- [ ] API keys del upstream solo por variable de entorno; el proceso falla al arrancar si falta una — **diferido a TICKET-101**: no existe todavía ningún proceso que arranque ni ninguna API key que validar
+- [ ] **Test:** ningún objeto de configuración expone la key en su `__repr__` o al serializarse — **diferido a TICKET-101**, por la misma razón: el objeto de configuración nace ahí
 
 **Preguntas que debes poder responder al cerrar la Fase 0:**
 - ¿Por qué un include condicional y no cambiar la config global?
