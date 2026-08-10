@@ -1,7 +1,7 @@
 # Proxy DLP para LLMs — Plan maestro
 
 > Documento vivo. Marca los checkboxes conforme avances.
-> Estado global: **Fase 0 — no iniciado**
+> Estado global: **Fase 0 completa — arrancando Fase 1**
 
 ---
 
