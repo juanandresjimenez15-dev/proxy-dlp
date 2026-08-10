@@ -262,18 +262,18 @@ Si empiezas así, **todos los commits de tu portafolio quedan atribuidos a la cu
   ```
   Verificado con repos de prueba dentro y fuera de `Portafolio/`: dentro resuelve la identidad personal, fuera la corporativa
 - [x] **No configures `gh`.** Es la única pieza que no entiende de directorios: guarda una cuenta activa global y `gh auth switch` la cambia para toda la máquina, lo que alteraría en silencio los comandos `gh` de tu ventana de trabajo. Y no hace falta: `git push` sube el código por SSH, y crear el repo, guardar secretos del CI, disparar el job nocturno y abrir PRs se hacen desde la web. Si algún día aparece una razón real, se monta con `GH_CONFIG_DIR=~/.config/gh-personal` — nunca con `auth switch`
-- [ ] **Crear el repo en GitHub desde la web** (público), con la cuenta personal, y agregar el remoto a mano:
+- [x] **Crear el repo en GitHub desde la web** (público), con la cuenta personal, y agregar el remoto a mano:
   ```bash
   git remote add origin github-personal:<tu-usuario>/proxy-dlp.git
   ```
   Fíjate que la URL usa el alias `github-personal`, no `git@github.com` — eso es lo que amarra el push a la llave correcta
-- [ ] **Verificar que funciona** — dentro de `proxy-dlp/`, tras `git init`:
+- [x] **Verificar que funciona** — dentro de `proxy-dlp/`, tras `git init`:
   ```bash
   git config user.email    # debe mostrar la personal, NO dev1@ispnexus.co
   git remote -v            # debe mostrar github-personal:, no git@github.com:
   ```
-- [ ] Hacer un commit de prueba y confirmar en GitHub que aparece atribuido a la cuenta personal
-- [ ] **Hook `pre-commit` que aborte si la identidad es la corporativa.** La verificación manual se olvida; el hook no:
+- [x] Hacer un commit de prueba y confirmar en GitHub que aparece atribuido a la cuenta personal — commit `efabcbf`, autor `Juan Jimenez <...@users.noreply.github.com>`, push exitoso a `main`
+- [x] **Hook `pre-commit` que aborte si la identidad es la corporativa.** Instalado en `.git/hooks/pre-commit` y probado: con identidad corporativa simulada, aborta con exit 1; con la personal, deja pasar. Pendiente migrarlo al framework `pre-commit` versionado en TICKET-001, porque `.git/hooks/` no se sube al repo
   ```bash
   #!/bin/sh
   case "$(git config user.email)" in
