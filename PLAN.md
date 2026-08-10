@@ -327,8 +327,8 @@ Aquí se resuelve una tensión que el backlog original tenía sin notar: el CI c
 ### TICKET-003 — Higiene de secretos
 
 - [x] Escaneo de secretos en CI (`gitleaks`) — wireado en el job `fast` de `.github/workflows/ci.yml`
-- [ ] API keys del upstream solo por variable de entorno; el proceso falla al arrancar si falta una — **diferido a TICKET-101**: no existe todavía ningún proceso que arranque ni ninguna API key que validar
-- [ ] **Test:** ningún objeto de configuración expone la key en su `__repr__` o al serializarse — **diferido a TICKET-101**, por la misma razón: el objeto de configuración nace ahí
+- [x] API keys del upstream solo por variable de entorno; el proceso falla al arrancar si falta una — `app/proxy/config.py`, verificado: sin `UPSTREAM_BASE_URL`/`UPSTREAM_API_KEY` el proceso lanza `ValidationError` al importar el módulo, antes de escuchar el puerto
+- [x] **Test:** ningún objeto de configuración expone la key en su `__repr__` o al serializarse — `UPSTREAM_API_KEY` usa `pydantic.SecretStr`, verificado que `repr()`/`str()` muestran `**********`, nunca el valor real
 
 **Preguntas que debes poder responder al cerrar la Fase 0:**
 - ¿Por qué un include condicional y no cambiar la config global?
@@ -342,11 +342,11 @@ Aquí se resuelve una tensión que el backlog original tenía sin notar: el CI c
 
 ### TICKET-101 — Endpoint compatible con OpenAI
 
-- [ ] `POST /v1/chat/completions` que reenvía el payload **sin modificar** al proveedor real
-- [ ] Preservar headers relevantes, y propagar el `status code` del upstream tal cual
-- [ ] **Tests unitarios:** con la llamada al LLM mockeada, verificar que el payload sale byte-idéntico
-- [ ] **Test de integración:** flujo completo contra el stub local
-- [ ] **ADR-101:** por qué imitar el contrato OpenAI en vez de inventar uno propio
+- [x] `POST /v1/chat/completions` que reenvía el payload **sin modificar** al proveedor real — `app/proxy/main.py`, usa `request.body()` crudo, nunca `request.json()` (evita reserialización)
+- [x] Preservar headers relevantes, y propagar el `status code` del upstream tal cual — se filtran los headers hop-by-hop (RFC 7230 §6.1) antes de reenviar la respuesta
+- [x] **Tests unitarios:** con la llamada al LLM mockeada, verificar que el payload sale byte-idéntico — `tests/unit/test_proxy_passthrough.py` (3 tests: byte-identidad, propagación de status code, filtrado de headers hop-by-hop)
+- [x] **Test de integración:** flujo completo contra el stub local — `tests/integration/test_proxy_integration.py`, contra `tests/stubs/llm_stub.py`
+- [x] **ADR-101:** por qué imitar el contrato OpenAI en vez de inventar uno propio — `docs/adr/ADR-101-contrato-openai.md`
 
 ### TICKET-102 — Comportamiento ante fallos del upstream
 
