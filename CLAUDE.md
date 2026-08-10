@@ -127,6 +127,8 @@ Si alguna vez aparece algo que de verdad lo justifique, se monta con `GH_CONFIG_
 
 **Ramas: una por ticket, siempre.** Nunca commitear directo a `main`.
 
+> **Excepción documentada:** los commits de `TICKET-000` y `TICKET-001` se hicieron directo a `main`, porque son los que crean el repositorio mismo — no existía `main` protegido ni flujo de PR antes de que existieran. Es la única excepción permitida: bootstrap del repo. **Desde `TICKET-002` en adelante, la regla se sigue sin excepción.**
+
 - Nombre: `ticket-NNN-descripcion-corta` (ej. `ticket-202-arnes-de-medicion`).
 - Confirmar la rama actual en el preflight antes de empezar — no asumir que seguimos donde quedamos la sesión pasada.
 - Su valor no es organizativo, es que permiten **abandonar un experimento sin ensuciar `main`**. Las Fases 4 y 7 van a tener enfoques que no funcionan, y el plan pide documentarlos: con rama eso cuesta un `checkout`, sin rama cuesta un `revert` y un historial confuso.
