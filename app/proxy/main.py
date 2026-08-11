@@ -7,9 +7,10 @@ propio.
 """
 
 from fastapi import Depends, FastAPI, Request, Response
+from fastapi.responses import JSONResponse
 
 from app.proxy.config import get_settings
-from app.proxy.upstream import UpstreamClient
+from app.proxy.upstream import UpstreamClient, UpstreamTimeoutError, UpstreamUnavailableError
 
 # Se lee y se valida al IMPORTAR este modulo, es decir, al arrancar el
 # proceso -- no en el primer request. Si falta una variable de entorno
@@ -47,6 +48,7 @@ def get_upstream_client() -> UpstreamClient:
     return UpstreamClient(
         base_url=settings.upstream_base_url,
         api_key=settings.upstream_api_key.get_secret_value(),
+        timeout=settings.upstream_timeout_seconds,
     )
 
 
@@ -61,7 +63,33 @@ async def chat_completions(
     # es que el payload salga BYTE-IDENTICO al que entro.
     body = await request.body()
 
-    upstream_response = await upstream.chat_completions(body)
+    # Un 4xx/5xx del upstream es una respuesta HTTP normal -- se propaga
+    # tal cual mas abajo, sin pasar por aqui. Estas dos excepciones son
+    # para cuando NO hubo respuesta: el proveedor fallo, no el proxy.
+    # Se traduce a un mensaje generico y seguro -- nunca al cliente le
+    # llega el texto real de la excepcion interna.
+    try:
+        upstream_response = await upstream.chat_completions(body)
+    except UpstreamTimeoutError:
+        return JSONResponse(
+            status_code=504,
+            content={
+                "error": {
+                    "message": "El proveedor upstream no respondio a tiempo.",
+                    "type": "upstream_timeout",
+                }
+            },
+        )
+    except UpstreamUnavailableError:
+        return JSONResponse(
+            status_code=502,
+            content={
+                "error": {
+                    "message": "No se pudo contactar al proveedor upstream.",
+                    "type": "upstream_unavailable",
+                }
+            },
+        )
 
     response_headers = {
         key: value

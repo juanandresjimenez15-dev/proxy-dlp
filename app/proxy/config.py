@@ -7,7 +7,7 @@ tipo, no porque alguien se acuerde de ocultarlo (ver TICKET-003).
 
 from functools import lru_cache
 
-from pydantic import SecretStr
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -16,6 +16,10 @@ class Settings(BaseSettings):
 
     upstream_base_url: str
     upstream_api_key: SecretStr
+    # gt=0 no es solo documentacion: pydantic RECHAZA un valor <= 0 al
+    # arrancar. "Nunca infinito" (TICKET-102) queda garantizado por el tipo,
+    # no por una convencion que alguien podria romper por accidente.
+    upstream_timeout_seconds: float = Field(default=30.0, gt=0)
 
 
 @lru_cache

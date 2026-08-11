@@ -19,6 +19,26 @@ class UpstreamResponse:
     headers: dict[str, str]
 
 
+class UpstreamError(Exception):
+    """El proveedor no genero una respuesta HTTP normal.
+
+    Distinto de un 4xx/5xx del proveedor -- eso SI es una respuesta
+    normal y se propaga tal cual en UpstreamResponse. Esto es para
+    cuando ni siquiera hubo respuesta: no se pudo hablar con el, o no
+    contesto a tiempo. La ruta HTTP (main.py) traduce estas excepciones
+    a un codigo de error informativo, sin filtrar el detalle interno
+    (ver TICKET-102).
+    """
+
+
+class UpstreamTimeoutError(UpstreamError):
+    """El proveedor no respondio dentro del timeout configurado."""
+
+
+class UpstreamUnavailableError(UpstreamError):
+    """No se pudo establecer conexion con el proveedor (DNS, red, conexion rechazada, etc.)."""
+
+
 class UpstreamClient:
     """Reenvia el payload, sin modificarlo, al proveedor real."""
 
@@ -28,15 +48,25 @@ class UpstreamClient:
         self._timeout = timeout
 
     async def chat_completions(self, body: bytes) -> UpstreamResponse:
-        async with httpx.AsyncClient(timeout=self._timeout) as client:
-            response = await client.post(
-                f"{self._base_url}/chat/completions",
-                content=body,
-                headers={
-                    "Content-Type": "application/json",
-                    "Authorization": f"Bearer {self._api_key}",
-                },
-            )
+        try:
+            async with httpx.AsyncClient(timeout=self._timeout) as client:
+                response = await client.post(
+                    f"{self._base_url}/chat/completions",
+                    content=body,
+                    headers={
+                        "Content-Type": "application/json",
+                        "Authorization": f"Bearer {self._api_key}",
+                    },
+                )
+        except httpx.TimeoutException as exc:
+            # httpx.TimeoutException es subclase de httpx.RequestError, asi
+            # que este except tiene que ir ANTES del mas general de abajo.
+            raise UpstreamTimeoutError(f"El upstream no respondio en {self._timeout}s") from exc
+        except httpx.RequestError as exc:
+            raise UpstreamUnavailableError(
+                "No se pudo establecer conexion con el upstream"
+            ) from exc
+
         return UpstreamResponse(
             status_code=response.status_code,
             content=response.content,

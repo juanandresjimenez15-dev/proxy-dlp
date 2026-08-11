@@ -1,7 +1,7 @@
 # Proxy DLP para LLMs — Plan maestro
 
 > Documento vivo. Marca los checkboxes conforme avances.
-> Estado global: **Fase 0 completa — arrancando Fase 1**
+> Estado global: **Fase 1 completa — arrancando Fase 2**
 
 ---
 
@@ -350,18 +350,18 @@ Aquí se resuelve una tensión que el backlog original tenía sin notar: el CI c
 
 ### TICKET-102 — Comportamiento ante fallos del upstream
 
-- [ ] Manejo de timeout, 4xx y 5xx del proveedor, con distinción clara entre "el proveedor falló" y "el proxy falló"
-- [ ] Timeouts configurables; nunca infinitos
-- [ ] **Tests:** un caso por modo de fallo, verificando que el error que ve el cliente es informativo y no filtra internos
-- [ ] **ADR-102:** política de reintentos — y por qué reintentar automáticamente en un proxy DLP es delicado (un reintento duplica el envío de datos sensibles)
+- [x] Manejo de timeout, 4xx y 5xx del proveedor, con distinción clara entre "el proveedor falló" y "el proxy falló" — `app/proxy/upstream.py` (`UpstreamTimeoutError`, `UpstreamUnavailableError`) + `app/proxy/main.py` (traduce a 504/502 sin filtrar detalle interno; un 4xx/5xx normal del proveedor sigue propagándose tal cual, como en TICKET-101)
+- [x] Timeouts configurables; nunca infinitos — `app/proxy/config.py`, `upstream_timeout_seconds` con `Field(gt=0)`: pydantic rechaza el arranque si el valor es `<= 0`
+- [x] **Tests:** un caso por modo de fallo, verificando que el error que ve el cliente es informativo y no filtra internos — `tests/unit/test_proxy_upstream_failures.py` (timeout→504, inalcanzable→502, bug propio del proxy→500 sin filtrar)
+- [x] **ADR-102:** política de reintentos — y por qué reintentar automáticamente en un proxy DLP es delicado (un reintento duplica el envío de datos sensibles) — `docs/adr/ADR-102-politica-de-reintentos.md`
 
 ### TICKET-103 — Concurrencia desde el día uno
 
 El backlog original decía "bóveda scoped a la sesión/request" sin definir qué pasa con requests simultáneas. Se resuelve ahora, no después.
 
-- [ ] Modelo de aislamiento por request explícito y documentado
-- [ ] **Test:** N requests concurrentes con datos distintos; verificar que ninguna ve los datos de otra. Este test se mantiene y crece durante todo el proyecto
-- [ ] **ADR-103:** el modelo de concurrencia elegido
+- [x] Modelo de aislamiento por request explícito y documentado — `docs/adr/ADR-103-modelo-de-aislamiento-por-request.md`: estado por request via `Depends` de FastAPI, construido de nuevo en cada llamada, nunca cacheado ni en variable de módulo
+- [x] **Test:** N requests concurrentes con datos distintos; verificar que ninguna ve los datos de otra. Este test se mantiene y crece durante todo el proyecto — `tests/unit/test_proxy_concurrencia.py` (10 requests concurrentes, orden de finalización invertido a propósito para forzar que cualquier cruce de datos sea visible)
+- [x] **ADR-103:** el modelo de concurrencia elegido
 
 **Qué aprendes:** contratos de API, semántica de errores en sistemas intermediarios, y por qué el aislamiento de estado se diseña al principio.
 
