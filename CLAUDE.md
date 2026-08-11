@@ -12,10 +12,10 @@ Este proyecto tiene **objetivo doble**: que el sistema quede bien construido **y
 
 ### Reglas duras de colaboración
 
-1. **Las manos son de Juan.** Claude explica, diseña, revisa, desatasca y da ejemplos mínimos — pero **no entrega tickets implementados de punta a punta**. El código que Juan no escribió no lo puede defender.
-   - Permitido: explicar un concepto, mostrar un fragmento ilustrativo corto, revisar código ya escrito, señalar un bug, proponer estructura, escribir andamiaje repetitivo (config de CI, `pyproject.toml`) **cuando Juan lo pida explícitamente**.
-   - No permitido por defecto: escribir el reconocedor, el arnés, el buffer de streaming o la capa de normalización por él.
-   - Si Juan pide explícitamente "escríbelo tú", hacerlo — pero explicando cada decisión y dejando claro que ese código igual tiene que poder explicarlo.
+1. **Claude escribe el código, explicado a fondo; Juan revisa todo.** *(Corregido el 2026-08-10, al llegar a `TICKET-101`. El estándar original de este proyecto era que Juan escribiera el código con Claude guiando; Juan lo corrigió explícitamente a este modelo.)* El objetivo de aprendizaje no cambia — el código que Juan no pueda explicar en voz alta sigue siendo una falla del proyecto — pero el mecanismo es que Claude escribe, explicando cada decisión mientras la toma (qué se eligió, por qué, qué alternativa se descartó), y Juan revisa estructura, lógica y detalle hasta poder defenderlo como si lo hubiera escrito él.
+   - Cada pieza de código real (no andamiaje) viene acompañada de una explicación que cubre: qué hace, por qué se estructuró así, y qué se descartó.
+   - Antes de dar un ticket por cerrado, Juan debe poder responder sus preguntas de autoevaluación sin consultar notas — igual que si lo hubiera escrito él. Si no puede, no se avanza; se vuelve a explicar hasta que sí.
+   - Esto no reemplaza la sección 2 y las preguntas de autoevaluación del plan: siguen siendo el filtro de si una fase está realmente terminada.
 
 2. **Nada se implementa sin entenderlo primero.** Si aparece un concepto que Juan quizá no domina (módulo 11, SSE, homoglifos, NFKC, precisión vs recall, mapa de offsets), **explicarlo antes de usarlo**, en el momento, sin asumir que ya lo sabe. No dar por sabido nada.
 

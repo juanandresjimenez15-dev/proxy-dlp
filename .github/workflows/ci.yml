@@ -25,6 +25,15 @@ jobs:
         run: pip install -e ".[dev]"
 
       - name: Tests fast (unit + integration, contra el stub local)
+        # Estos tests jamas llaman a un upstream real -- lo reemplazan via
+        # app.dependency_overrides (ver test_proxy_passthrough.py). Pero
+        # Settings() se construye al IMPORTAR app.proxy.main (fail-closed,
+        # TICKET-101), asi que el proceso no arranca sin estas dos variables,
+        # aunque su valor nunca se use. No son secretos: no hace falta
+        # guardarlas en Settings -> Secrets.
+        env:
+          UPSTREAM_BASE_URL: http://127.0.0.1:11434/v1
+          UPSTREAM_API_KEY: valor-dummy-no-es-un-secreto-real
         run: pytest -m "unit or integration" -q
 
   redteam:
