@@ -375,16 +375,16 @@ El backlog original decía "bóveda scoped a la sesión/request" sin definir qu�
 
 ### TICKET-201 — Corpus etiquetado
 
-- [ ] **100% datos sintéticos.** Nunca datos reales de personas — ni tuyos. Genera con `Faker` (locales `es_CO`, `es_MX`, `es_AR`, `es_CL`, `es_ES`) + plantillas escritas a mano
-- [ ] Formato de etiqueta: por cada muestra, el texto y la lista de entidades con `tipo`, `inicio`, `fin`, `valor`
-- [ ] Composición mínima (~300 muestras):
-  - [ ] **Positivos claros** — PII inequívoca en contexto natural
-  - [ ] **Negativos claros** — texto sin PII
-  - [ ] **Negativos difíciles** — lo que causa over-redaction: nombres de producto ("Apollo", "Mercurio"), nombres de empresa, referencias culturales, números que parecen documentos pero no lo son
-  - [ ] **Casos borde** — PII en tablas, en JSON, en código, en direcciones URL
-  - [ ] **Multi-entidad** — varias entidades del mismo tipo en un texto, y la misma entidad repetida
-  - [ ] **Inglés** — subconjunto pequeño, para comparar contra el rendimiento en español y demostrar el sesgo
-- [ ] `eval/corpus/README.md`: cómo se generó, qué cubre, qué sesgos tiene reconocidos
+- [x] **100% datos sintéticos.** Nunca datos reales de personas — ni tuyos. Genera con `Faker` (locales `es_CO`, `es_MX`, `es_AR`, `es_CL`, `es_ES`) + plantillas escritas a mano — `eval/corpus/valores.py` (generadores por tipo) + `eval/corpus/plantillas.py` (frases) + `eval/corpus/generar.py` (orquesta y escribe `corpus.jsonl`, determinista con semilla fija)
+- [x] Formato de etiqueta: por cada muestra, el texto y la lista de entidades con `tipo`, `inicio`, `fin`, `valor` — verificado por `tests/unit/test_corpus.py::test_los_spans_de_entidades_coinciden_con_el_texto`
+- [x] Composición mínima (~300 muestras): 300 exactas
+  - [x] **Positivos claros** — 100, ~12-13 por cada uno de los 8 tipos en alcance
+  - [x] **Negativos claros** — 50
+  - [x] **Negativos difíciles** — 50 (folios, tracking, versiones, códigos postales, nombres de producto/empresa)
+  - [x] **Casos borde** — 40 (tablas, JSON, código, URLs)
+  - [x] **Multi-entidad** — 40 (mismo tipo con valores distintos, y la misma entidad repetida)
+  - [x] **Inglés** — 20
+- [x] `eval/corpus/README.md`: cómo se generó, qué cubre, qué sesgos tiene reconocidos
 
 > **Sé honesto con los negativos difíciles.** Es tentador llenar el corpus de casos fáciles porque dan métricas bonitas. Un corpus que solo tiene casos fáciles produce un sistema que solo funciona en casos fáciles.
 

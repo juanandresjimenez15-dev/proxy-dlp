@@ -23,6 +23,7 @@ dev = [
     "ruff>=0.6",
     "black>=24.8",
     "pre-commit>=3.8",
+    "Faker>=30",
 ]
 
 [tool.pytest.ini_options]
