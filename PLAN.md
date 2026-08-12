@@ -1,7 +1,7 @@
 # Proxy DLP para LLMs — Plan maestro
 
 > Documento vivo. Marca los checkboxes conforme avances.
-> Estado global: **Fase 1 completa — arrancando Fase 2**
+> Estado global: **Fase 2 completa — arrancando Fase 3**
 
 ---
 
@@ -400,9 +400,9 @@ El backlog original decía "bóveda scoped a la sesión/request" sin definir qu�
 
 ### TICKET-203 — Baseline y bitácora de métricas
 
-- [ ] Medir un baseline **solo-regex** (sin NER, sin Presidio) y registrarlo
-- [ ] Crear `docs/metrics-log.md` con la primera entrada. Formato por entrada: fecha, fase, cambio aplicado, tabla de métricas antes/después, y una nota de qué te sorprendió
-- [ ] **ADR-201:** por qué el arnés se construyó antes que el detector
+- [x] Medir un baseline **solo-regex** (sin NER, sin Presidio) y registrarlo — `eval/harness/baseline_regex.py`: recall 0.825, precisión 0.521, over-redaction 30.0%
+- [x] Crear `docs/metrics-log.md` con la primera entrada. Formato por entrada: fecha, fase, cambio aplicado, tabla de métricas antes/después, y una nota de qué te sorprendió
+- [x] **ADR-201:** por qué el arnés se construyó antes que el detector — `docs/adr/ADR-201-medir-antes-de-construir.md`
 
 > **Qué aprendes:** la diferencia entre precisión y recall y por qué en un sistema de seguridad no son intercambiables; por qué el promedio miente; y la disciplina de no aceptar "mejoró" sin un número. Esto se transfiere a cualquier trabajo con ML o sistemas de detección.
 
