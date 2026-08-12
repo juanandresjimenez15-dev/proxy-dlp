@@ -24,3 +24,9 @@ htmlcov/
 eval/corpus/**/real/
 *.real.json
 *.real.csv
+
+# Salida del arnes de medicion (TICKET-202): resultado transitorio de la
+# ULTIMA corrida local, no un registro historico -- eso es docs/metrics-log.md,
+# que si se comitea a mano cuando hay algo que reportar.
+eval/harness/ultimo_resultado.json
+eval/harness/ultimo_resultado.md

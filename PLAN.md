@@ -390,13 +390,13 @@ El backlog original decía "bóveda scoped a la sesión/request" sin definir qu�
 
 ### TICKET-202 — El arnés de medición
 
-- [ ] Script `eval/harness/run.py` que corre el detector sobre el corpus y calcula:
-  - [ ] **Precisión, recall, F1** — globales y **desglosados por tipo de entidad** (el promedio esconde que un tipo está roto)
-  - [ ] **Tasa de over-redaction** — % de negativos difíciles marcados como PII. Métrica de primera clase, no secundaria
-  - [ ] **Latencia** — p50 / p95 / p99
-- [ ] Coincidencia por span (posición), no solo por valor: detectar la entidad correcta en el lugar equivocado es un fallo
-- [ ] Salida en JSON (para diffs) y en tabla markdown (para leer)
-- [ ] **Test del arnés:** aliméntalo con un detector falso de resultados conocidos (uno perfecto, uno que no detecta nada, uno que marca todo) y verifica que las métricas dan exactamente lo esperado. **Un arnés con un bug te miente durante todo el proyecto.**
+- [x] Script `eval/harness/run.py` que corre el detector sobre el corpus y calcula:
+  - [x] **Precisión, recall, F1** — globales y **desglosados por tipo de entidad** (el promedio esconde que un tipo está roto) — `eval/harness/metricas.py`
+  - [x] **Tasa de over-redaction** — % de negativos difíciles marcados como PII. Métrica de primera clase, no secundaria — `metricas.calcular_over_redaction`
+  - [x] **Latencia** — p50 / p95 / p99 — medida con `time.perf_counter()` por muestra, `metricas.percentil`
+- [x] Coincidencia por span (posición), no solo por valor: detectar la entidad correcta en el lugar equivocado es un fallo — coincidencia **exacta** de `(tipo, inicio, fin)`, decisión confirmada explícitamente (ver `metricas.py`, docstring de `comparar_entidades`)
+- [x] Salida en JSON (para diffs) y en tabla markdown (para leer) — `run.escribir_resultado`, `run.formatear_markdown`; salida transitoria, no se comitea (`.gitignore`)
+- [x] **Test del arnés:** aliméntalo con un detector falso de resultados conocidos (uno perfecto, uno que no detecta nada, uno que marca todo) y verifica que las métricas dan exactamente lo esperado. **Un arnés con un bug te miente durante todo el proyecto.** — `tests/unit/test_harness.py`
 
 ### TICKET-203 — Baseline y bitácora de métricas
 
