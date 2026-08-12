@@ -1,7 +1,7 @@
 # Proxy DLP para LLMs — Plan maestro
 
 > Documento vivo. Marca los checkboxes conforme avances.
-> Estado global: **Fase 1 completa — arrancando Fase 2**
+> Estado global: **Fase 2 completa — arrancando Fase 3**
 
 ---
 
@@ -375,34 +375,34 @@ El backlog original decía "bóveda scoped a la sesión/request" sin definir qu�
 
 ### TICKET-201 — Corpus etiquetado
 
-- [ ] **100% datos sintéticos.** Nunca datos reales de personas — ni tuyos. Genera con `Faker` (locales `es_CO`, `es_MX`, `es_AR`, `es_CL`, `es_ES`) + plantillas escritas a mano
-- [ ] Formato de etiqueta: por cada muestra, el texto y la lista de entidades con `tipo`, `inicio`, `fin`, `valor`
-- [ ] Composición mínima (~300 muestras):
-  - [ ] **Positivos claros** — PII inequívoca en contexto natural
-  - [ ] **Negativos claros** — texto sin PII
-  - [ ] **Negativos difíciles** — lo que causa over-redaction: nombres de producto ("Apollo", "Mercurio"), nombres de empresa, referencias culturales, números que parecen documentos pero no lo son
-  - [ ] **Casos borde** — PII en tablas, en JSON, en código, en direcciones URL
-  - [ ] **Multi-entidad** — varias entidades del mismo tipo en un texto, y la misma entidad repetida
-  - [ ] **Inglés** — subconjunto pequeño, para comparar contra el rendimiento en español y demostrar el sesgo
-- [ ] `eval/corpus/README.md`: cómo se generó, qué cubre, qué sesgos tiene reconocidos
+- [x] **100% datos sintéticos.** Nunca datos reales de personas — ni tuyos. Genera con `Faker` (locales `es_CO`, `es_MX`, `es_AR`, `es_CL`, `es_ES`) + plantillas escritas a mano — `eval/corpus/valores.py` (generadores por tipo) + `eval/corpus/plantillas.py` (frases) + `eval/corpus/generar.py` (orquesta y escribe `corpus.jsonl`, determinista con semilla fija)
+- [x] Formato de etiqueta: por cada muestra, el texto y la lista de entidades con `tipo`, `inicio`, `fin`, `valor` — verificado por `tests/unit/test_corpus.py::test_los_spans_de_entidades_coinciden_con_el_texto`
+- [x] Composición mínima (~300 muestras): 300 exactas
+  - [x] **Positivos claros** — 100, ~12-13 por cada uno de los 8 tipos en alcance
+  - [x] **Negativos claros** — 50
+  - [x] **Negativos difíciles** — 50 (folios, tracking, versiones, códigos postales, nombres de producto/empresa)
+  - [x] **Casos borde** — 40 (tablas, JSON, código, URLs)
+  - [x] **Multi-entidad** — 40 (mismo tipo con valores distintos, y la misma entidad repetida)
+  - [x] **Inglés** — 20
+- [x] `eval/corpus/README.md`: cómo se generó, qué cubre, qué sesgos tiene reconocidos
 
 > **Sé honesto con los negativos difíciles.** Es tentador llenar el corpus de casos fáciles porque dan métricas bonitas. Un corpus que solo tiene casos fáciles produce un sistema que solo funciona en casos fáciles.
 
 ### TICKET-202 — El arnés de medición
 
-- [ ] Script `eval/harness/run.py` que corre el detector sobre el corpus y calcula:
-  - [ ] **Precisión, recall, F1** — globales y **desglosados por tipo de entidad** (el promedio esconde que un tipo está roto)
-  - [ ] **Tasa de over-redaction** — % de negativos difíciles marcados como PII. Métrica de primera clase, no secundaria
-  - [ ] **Latencia** — p50 / p95 / p99
-- [ ] Coincidencia por span (posición), no solo por valor: detectar la entidad correcta en el lugar equivocado es un fallo
-- [ ] Salida en JSON (para diffs) y en tabla markdown (para leer)
-- [ ] **Test del arnés:** aliméntalo con un detector falso de resultados conocidos (uno perfecto, uno que no detecta nada, uno que marca todo) y verifica que las métricas dan exactamente lo esperado. **Un arnés con un bug te miente durante todo el proyecto.**
+- [x] Script `eval/harness/run.py` que corre el detector sobre el corpus y calcula:
+  - [x] **Precisión, recall, F1** — globales y **desglosados por tipo de entidad** (el promedio esconde que un tipo está roto) — `eval/harness/metricas.py`
+  - [x] **Tasa de over-redaction** — % de negativos difíciles marcados como PII. Métrica de primera clase, no secundaria — `metricas.calcular_over_redaction`
+  - [x] **Latencia** — p50 / p95 / p99 — medida con `time.perf_counter()` por muestra, `metricas.percentil`
+- [x] Coincidencia por span (posición), no solo por valor: detectar la entidad correcta en el lugar equivocado es un fallo — coincidencia **exacta** de `(tipo, inicio, fin)`, decisión confirmada explícitamente (ver `metricas.py`, docstring de `comparar_entidades`)
+- [x] Salida en JSON (para diffs) y en tabla markdown (para leer) — `run.escribir_resultado`, `run.formatear_markdown`; salida transitoria, no se comitea (`.gitignore`)
+- [x] **Test del arnés:** aliméntalo con un detector falso de resultados conocidos (uno perfecto, uno que no detecta nada, uno que marca todo) y verifica que las métricas dan exactamente lo esperado. **Un arnés con un bug te miente durante todo el proyecto.** — `tests/unit/test_harness.py`
 
 ### TICKET-203 — Baseline y bitácora de métricas
 
-- [ ] Medir un baseline **solo-regex** (sin NER, sin Presidio) y registrarlo
-- [ ] Crear `docs/metrics-log.md` con la primera entrada. Formato por entrada: fecha, fase, cambio aplicado, tabla de métricas antes/después, y una nota de qué te sorprendió
-- [ ] **ADR-201:** por qué el arnés se construyó antes que el detector
+- [x] Medir un baseline **solo-regex** (sin NER, sin Presidio) y registrarlo — `eval/harness/baseline_regex.py`: recall 0.825, precisión 0.521, over-redaction 30.0%
+- [x] Crear `docs/metrics-log.md` con la primera entrada. Formato por entrada: fecha, fase, cambio aplicado, tabla de métricas antes/después, y una nota de qué te sorprendió
+- [x] **ADR-201:** por qué el arnés se construyó antes que el detector — `docs/adr/ADR-201-medir-antes-de-construir.md`
 
 > **Qué aprendes:** la diferencia entre precisión y recall y por qué en un sistema de seguridad no son intercambiables; por qué el promedio miente; y la disciplina de no aceptar "mejoró" sin un número. Esto se transfiere a cualquier trabajo con ML o sistemas de detección.
 
