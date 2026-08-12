@@ -133,7 +133,9 @@ Si alguna vez aparece algo que de verdad lo justifique, se monta con `GH_CONFIG_
 - Confirmar la rama actual en el preflight antes de empezar — no asumir que seguimos donde quedamos la sesión pasada.
 - Su valor no es organizativo, es que permiten **abandonar un experimento sin ensuciar `main`**. Las Fases 4 y 7 van a tener enfoques que no funcionan, y el plan pide documentarlos: con rama eso cuesta un `checkout`, sin rama cuesta un `revert` y un historial confuso.
 
-**Pull requests: uno por fase, no por ticket.** Se abren desde la web (no se usa `gh`, ver §3.1.1).
+**Commits: uno por ticket, siempre.** Cada ticket cierra con su propio commit al terminarlo (checkboxes marcados, ADR si aplica, tests en verde) — nunca se acumulan los cambios de varios tickets sin comitear hasta el final de la fase. Agrupar tickets en un solo commit hace perder el hilo de qué cambio corresponde a qué ticket, tanto en revisión como después, leyendo el historial.
+
+**Pull requests: uno por fase, no por ticket.** Se abren desde la web (no se usa `gh`, ver §3.1.1). Esto no contradice la regla anterior: varios commits (uno por ticket) se acumulan en la misma rama de la fase, y el PR agrupa todos esos commits de una vez cuando la fase completa está lista.
 
 - El valor de un PR en un repo de una sola persona está **enteramente en su descripción**. 40 PRs con descripciones vacías se leen como teatro; 11 PRs que cuentan qué cambió y qué le pasó a las métricas son la demostración de la metodología del proyecto.
 - **Un PR con descripción vacía es peor que no hacer PR.** Si una fase no tiene nada que reportar, se mergea la rama y ya.
